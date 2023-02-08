@@ -20,9 +20,11 @@ I. Setup
 
 On lance la commande suivante pour installer Emby:
 
+
 ```
 yum install https://github.com/MediaBrowser/Emby.Releases/releases/download/4.7.11.0/emby-server-rpm_4.7.11.0_x86_64.rpm
 ```
+
 
 Puis on s'y connecte:
 
@@ -30,8 +32,6 @@ http://10.105.1.2:8096
 
 🌞 Une fois en place, nous pouvons mettre en évidence :
 
-
-          -quel service est démarré:
           
 ```
 [matt@localhost ~]$ sudo systemctl status emby-server
@@ -71,6 +71,7 @@ emby         709       1  0 12:25 ?        00:00:03 /opt/emby-server/system/Emby
 ```
 tcp    LISTEN  0       512                                 *:8096                 *:*       users:(("EmbyServer",pid=709,fd=193))
 ```
+
 
           -avec quel utilisateur est lancé le(s) processus:
           
@@ -136,6 +137,8 @@ Maintenant, nous pouvons aller sur l'interface web de Emby, créer une bibliothe
 
 2. Reverse proxy
 
+
+A. Setup
 
 🌞 Mise en place de NGINX
 
@@ -211,6 +214,7 @@ server {
       return 301 $scheme://$host/remote.php/dav;
     }
 }
+```
 
 ```
 # Copyright (c) 1993-2009 Microsoft Corp.
@@ -238,7 +242,41 @@ server {
 ```
 
 
+Pour le HTTPS:
 
+On va générer une paire de clés sur le serveur, puis changer le nom des clés, puis il faut rediriger les connexions en http:
+
+```
+server {
+
+    listen 80 default_server;
+
+
+    server_name _;
+
+
+    return 301 https://$host$request_uri;
+```
+
+Puis on accède a l'application web avec le lien https://emby.peche.linux
+
+B. Secu
+
+🌞 Ajoutez une règle firewall
+
+Pour quel la connexion par le web.peche.linux soit bloquée, on peut utiliser la commande suivante:
+
+```
+sudo iptables -A INPUT -s 10.105.1.1 -j DROP
+```
+
+Pour autoriser les connexions entrantes que depuis l'adresse IP 10.105.1.3 qui est celle de proxy.peche.linux, on peut utiliser cette commande:
+
+```
+sudo iptables -A INPUT -s 10.105.1.3 -j ACCEPT
+```
+
+Puis vérifier avec sudo iptables -L qui liste les connexions autorisés.
 
 
 3. Backup
@@ -250,6 +288,8 @@ On crée un repertoire backups/music/ dans notre machine 🖥️ backup.peche.li
 ```
 [matt@localhost ~]$ sudo mkdir -p /backups/music/
 ```
+
+
 
 
 
