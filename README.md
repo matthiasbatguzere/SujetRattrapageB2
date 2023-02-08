@@ -235,6 +235,7 @@ server {
 #	127.0.0.1       localhost
 #	::1             localhost
 10.105.1.3        emby.peche.linux
+```
 
 
 
